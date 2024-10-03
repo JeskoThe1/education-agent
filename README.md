@@ -91,10 +91,16 @@ education_analysis_project/
    cd frontend/src
    streamlit run app.py
    ```
+   
+3. Or you may do two previous operations in one go:
+   ```
+   docker compose up --build
+   ```
+   But then don't forget to change base url in frontend/src/api_client.py with "http://api:8000"
+   
+5. Open your web browser and navigate to `http://localhost:8501`
 
-3. Open your web browser and navigate to `http://localhost:8501`
-
-4. Upload education-related documents and start analyzing!
+6. Upload education-related documents and start analyzing!
 
 ## API Documentation
 
