@@ -69,9 +69,7 @@ education_analysis_project/
 
 3. Install the required packages:
    ```
-   pip install -r backend/requirements.txt
-   pip install -r frontend/requirements.txt
-   pip install -r api/requirements.txt
+   pip install -r requirements.txt
    ```
 
 4. Set up environment variables:
