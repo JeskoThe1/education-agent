@@ -10,6 +10,7 @@ __pycache__/
 .Python
 milvus/
 uploads/
+notebooks/
 build/
 develop-eggs/
 dist/
