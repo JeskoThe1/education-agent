@@ -22,40 +22,6 @@ The Education System Analyzer is a sophisticated tool designed to analyze and co
 - Vector Store Integration: Efficient storage and retrieval of document embeddings
 - User-friendly Interface: Built with Streamlit for easy interaction
 
-## Project Structure
-
-```
-education_analysis_project/
-├── backend/
-│   ├── src/
-│   │   ├── analysis/
-│   │   │   ├── education_analyzer.py
-│   │   │   └── comparative_analysis.py
-│   │   ├── data_processing/
-│   │   │   └── preprocessor.py
-│   │   ├── storage/
-│   │   │   └── vectorstore.py
-│   │   ├── config.py
-│   │   └── main.py
-│   ├── Dockerfile
-│   └── tests/
-├── frontend/
-│   ├── Dockerfile
-│   ├── src/
-│   │   ├── app.py
-│   │   ├── api_client.py
-│   └── └── file_processor.py
-├── api/
-│   ├── main.p
-│   └── Dockerfile
-├── data/
-│   ├── raw/
-│   └── processed/
-├── requirements.txt
-├── docker-compose.yml
-└── README.md
-```
-
 ## Installation
 
 1. Clone the repository:
