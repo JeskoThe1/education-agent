@@ -1,58 +1,56 @@
-from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel
-from typing import List, Optional
-import sys
 import os
+import sys
+from fastapi import FastAPI, HTTPException, UploadFile, File
 
-# Add the project root to the Python path
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
-from backend.src.analysis.education_analyzer import EducationAnalyzer
-from backend.src.analysis.comparative_analysis import ComparativeAnalysis
-from backend.src.rag.vectorstore import VectorStore
-from backend.src.data_processing.preprocessor import Preprocessor
-from backend.src.config import Config
-from langchain_core.documents import Document
+from pydantic import BaseModel
+from backend.src.rag.vectorstore import setup_vectorstore, add_documents_to_vectorstore
+from backend.src.graph_database.neo4j_manager import setup_graph_database, add_graph_documents, create_graph_rag_chain
+from backend.src.workflow.graph import create_workflow
+from backend.src.data_processing.preprocessor import preprocess_document
 
 app = FastAPI()
 
-class SerializedDocument(BaseModel):
-    page_content: str
-    metadata: dict
-
 class AnalyzeRequest(BaseModel):
-    query: str
-    documents: Optional[List[SerializedDocument]] = None
+    question: str
 
-class CompareRequest(BaseModel):
-    query: str
+UPLOAD_DIR = "uploads"
+os.makedirs(UPLOAD_DIR, exist_ok=True)
 
-config = Config()
-education_analyzer = EducationAnalyzer()
-comparative_analyzer = ComparativeAnalysis()
-vectorstore = VectorStore()
-preprocessor = Preprocessor()
+vectorstore = setup_vectorstore()
+graph = setup_graph_database()
+graph_rag_chain = create_graph_rag_chain(graph)
+workflow = create_workflow()
 
 @app.post("/analyze")
 async def analyze(request: AnalyzeRequest):
     try:
-        if request.documents:
-            documents = [Document(page_content=doc.page_content, metadata=doc.metadata) for doc in request.documents]
-            vectorstore.add_documents(documents)
-        
-        result = education_analyzer.analyze_country(request.query)
-        return {"result": result}
+        print(request)
+        initial_state = {
+            "question": request.question,
+            "retriever": vectorstore.as_retriever(),                        
+            "graph_rag_chain": graph_rag_chain       
+        }
+        result = None
+        for output in workflow.stream(initial_state):
+            for key, value in output.items():
+                print(f"Finished running: {key}:")
+        result = value["generation"]
+        return {"result": result.content}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@app.post("/compare")
-async def compare(request: CompareRequest):
+@app.post("/upload_document")
+async def upload_document(file: UploadFile = File(...)):
     try:
-        result = comparative_analyzer.compare_countries(request.query)
-        return {"result": result}
+        file_path = os.path.join(UPLOAD_DIR, file.filename)
+        with open(file_path, "wb") as buffer:
+            buffer.write(await file.read())
+        
+        documents = preprocess_document(file_path)
+        add_documents_to_vectorstore(vectorstore, documents)
+        add_graph_documents(graph, documents)
+        
+        return {"success": True, "message": f"File {file.filename} processed and added to the database"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-
-if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)

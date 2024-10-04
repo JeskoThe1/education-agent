@@ -1,28 +1,16 @@
-from langchain_chroma import Chroma
+from langchain_milvus import Milvus
 from langchain_openai import OpenAIEmbeddings
-import sys
+from ..config import MILVUS_URI, OPENAI_API_KEY
 import os
 
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from config import config
+def setup_vectorstore():
+    os.makedirs(MILVUS_URI, exist_ok=True)
+    return Milvus(
+        embedding_function=OpenAIEmbeddings(openai_api_key=OPENAI_API_KEY),
+        connection_args={"uri": MILVUS_URI},
+        collection_name="education_documents",
+        auto_id=True
+    )
 
-
-class VectorStore:
-    def __init__(self):
-        self.embeddings = OpenAIEmbeddings()
-        self.vectorstore = Chroma(
-            persist_directory=config.CHROMA_PERSIST_DIRECTORY,
-            embedding_function=self.embeddings
-        )
-
-    def add_texts(self, texts):
-        self.vectorstore.add_texts(texts)
-
-    def add_documents(self, documents):
-        self.vectorstore.add_documents(documents)
-
-    def similarity_search(self, query, k=4):
-        return self.vectorstore.similarity_search(query, k=k)
-    
-    def get_retriever(self, k=4):
-        return self.vectorstore.as_retriever(search_kwargs={"k": k})
+def add_documents_to_vectorstore(vectorstore, documents):
+    vectorstore.add_documents(documents)

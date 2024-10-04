@@ -4,26 +4,38 @@ class APIClient:
     def __init__(self, base_url="http://localhost:8000"):
         self.base_url = base_url
 
-    def analyze_query(self, query, documents=None):
+    def analyze_query(self, query):
+        """
+        Send a query to the API for analysis.
+        
+        Args:
+            query (str): The question to be analyzed.
+        
+        Returns:
+            str: The analysis result.
+        """
         endpoint = f"{self.base_url}/analyze"
-        
-        # Convert Document objects to dictionaries
-        serialized_documents = None
-        if documents:
-            serialized_documents = [
-                {
-                    "page_content": doc.page_content,
-                    "metadata": doc.metadata
-                }
-                for doc in documents
-            ]
-        
-        data = {"query": query, "documents": serialized_documents}
-        response = requests.post(endpoint, json=data)
-        return response.json()["result"]
+        response = requests.post(endpoint, json={"question": query})
+        print(response)
+        if response.status_code == 200:
+            return response.json()["result"]
+        else:
+            raise Exception(f"Error in analyze_query: {response.text}")
 
-    def compare_countries(self, query):
-        endpoint = f"{self.base_url}/compare"
-        data = {"query": query}
-        response = requests.post(endpoint, json=data)
-        return response.json()["result"]
+    def upload_document(self, file):
+        """
+        Upload a document to the API for processing.
+        
+        Args:
+            file (file object): The file to be uploaded.
+        
+        Returns:
+            dict: A dictionary containing the success status and a message.
+        """
+        endpoint = f"{self.base_url}/upload_document"
+        files = {"file": (file.name, file, file.type)}
+        response = requests.post(endpoint, files=files)
+        if response.status_code == 200:
+            return response.json()
+        else:
+            raise Exception(f"Error in upload_document: {response.text}")

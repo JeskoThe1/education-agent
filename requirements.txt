@@ -18,3 +18,6 @@ pandas
 requests
 PyPDF2
 python-docx
+docx2txt
+neo4j
+python-multipart

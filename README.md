@@ -78,7 +78,11 @@ education_analysis_project/
 4. Set up environment variables:
    Create a `.env` file in the project root and add the following:
    ```
-   OPENAI_API_KEY=your_openai_api_key_here
+    OPENAI_API_KEY=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
+    TAVILY_API_KEY=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
+    NEO4J_URI=neo4j+s://f1111641.databases.neo4j.io
+    NEO4J_USERNAME=neo4j
+    NEO4J_PASSWORD=0KpiYnG6XRPYTCJvlr8Ctnwq3h1uehotL04cUGtAvFI
    ```
 
 ## Usage
@@ -86,7 +90,7 @@ education_analysis_project/
 1. Start the API server:
    ```
    cd api
-   uvicorn main:app --reload
+   uvicorn main:app --host 0.0.0.0 --port 8000 --reload
    ```
 
 2. In a new terminal, start the Streamlit app:
