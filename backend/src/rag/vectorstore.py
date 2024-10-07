@@ -4,7 +4,7 @@ from ..config import MILVUS_URI, OPENAI_API_KEY
 import os
 
 def setup_vectorstore():
-    os.makedirs(MILVUS_URI, exist_ok=True)
+    os.makedirs(os.path.dirname(MILVUS_URI), exist_ok=True)
     return Milvus(
         embedding_function=OpenAIEmbeddings(openai_api_key=OPENAI_API_KEY),
         connection_args={"uri": MILVUS_URI},
