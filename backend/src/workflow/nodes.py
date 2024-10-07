@@ -18,6 +18,7 @@ def retrieve_from_vectorstore(state):
     print("---RETRIEVE FROM VECTOR STORE---")
     question = state["question"]
     documents = state["retriever"].invoke(question)
+    print(documents)
     return {"vector_documents": documents, "question": question}
 
 def retrieve_from_graph(state):
@@ -25,6 +26,7 @@ def retrieve_from_graph(state):
     question = state["question"]
     graph_qa_chain = state["graph_rag_chain"]
     graph_result = graph_qa_chain.invoke({"query": question})['result']
+    print(graph_result)
     return {"graph_result": graph_result, "question": question}
 
 def check_relevance(state):
@@ -57,6 +59,7 @@ def web_search(state):
     print("---WEB SEARCH---")
     question = state["question"]
     search_results = perform_web_search(question)
+    print(search_results)
     return {"web_results": search_results, "question": question}
 
 def generate(state):
@@ -66,11 +69,25 @@ def generate(state):
     graph_result = state.get("graph_result", "")
     web_results = state.get("web_results", "")
 
-    context = "\nVector Results:".join([doc.page_content for doc in vector_documents]) if len(vector_documents) else " "
-    context += "\nGraph Results:\n" + "\n".join(graph_result) 
+    context = ""
+        
+    if vector_documents:
+        context += "Vector Results:\n"
+        for i, doc in enumerate(vector_documents, 1):
+            context += f"Document {i}:\n"
+            context += f"Content: {doc.page_content}\n"
+            context += f"Metadata: Page {doc.metadata.get('page', 'N/A')}, Source: {doc.metadata.get('source', 'N/A')}\n\n"
+
+    if graph_result:
+        context += "Graph Results:\n" + "\n".join(graph_result) + "\n\n"
+
     if web_results:
-        context += "\nWeb Search Results:\n" + "\n".join([d["content"] for d in web_results])
-    
+        context += "Web Search Results:\n"
+        for i, result in enumerate(web_results, 1):
+            context += f"Result {i}:\n"
+            context += f"Content: {result['content']}\n"
+            context += f"URL: {result.get('url', 'N/A')}\n\n"  
+
     generation = education_analyzer.invoke({
         "question": question,
         "context": context
