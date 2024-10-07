@@ -20,17 +20,24 @@ def create_graph_documents(documents):
     graph_transformer = LLMGraphTransformer(
         llm=graph_llm,
         allowed_nodes=[
-            "Document", "Country", "EducationSystem", "EducationLevel", 
-            "Institution", "Policy"
+            "Document",
+            "Country",
+            "EducationSystem",
+            "EducationLevel",
+            "Policy"
         ],
         node_properties=[
-            "title", "content", "year", "source", "duration", "ageRange", 
-            "isCompulsory", "qualificationAwarded", "fundingSource", 
-            "governanceLevel", "ISCEDLevel", "type"
+            "title",
+            "content",
+            "year",
+            "isCompulsory",
+            "ISCEDLevel"
         ],
         allowed_relationships=[
-            "DESCRIBES", "HAS_SYSTEM", "INCLUDES_LEVEL", "OFFERS_PROGRAM",
-            "IMPLEMENTS", "REGULATES", "PRECEDES"
+            "DESCRIBES",
+            "HAS_SYSTEM",
+            "INCLUDES_LEVEL",
+            "IMPLEMENTS"
         ],
     )
 
@@ -51,6 +58,9 @@ def create_graph_rag_chain(graph):
         Use the following schema to generate a Cypher query that answers the given question.
         Make the query flexible by using case-insensitive matching and partial string matching where appropriate.
         Focus on searching document contents and education system properties as they contain the most relevant information.
+        
+        If you need to use UNION, ensure that all subqueries in the UNION have the same return column names.
+        Use aliases (AS) to standardize column names across all subqueries.
         
         Schema:
         {schema}
