@@ -22,3 +22,4 @@ python-docx
 docx2txt
 neo4j
 python-multipart
+pymilvus
