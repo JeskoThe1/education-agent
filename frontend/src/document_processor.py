@@ -16,7 +16,7 @@ def upload_document(file):
             buffer.write(file.getvalue())
         
         documents = preprocess_document(file_path)
-        add_documents_to_vectorstore(documents)
+        add_documents_to_vectorstore(vectorstore, documents)
         add_graph_documents(documents)
         
         return True, f"File {file.name} processed and added to the database"
