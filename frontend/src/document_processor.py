@@ -17,7 +17,7 @@ def upload_document(file):
         
         documents = preprocess_document(file_path)
         add_documents_to_vectorstore(vectorstore, documents)
-        add_graph_documents(documents)
+        add_graph_documents(graph, documents)
         
         return True, f"File {file.name} processed and added to the database"
     except Exception as e:
