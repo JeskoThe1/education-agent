@@ -2,6 +2,8 @@ import os
 import streamlit as st
 from database_setup import get_resources
 from backend.src.data_processing.preprocessor import preprocess_document
+from backend.src.rag.vectorstore import add_documents_to_vectorstore
+from backend.src.graph_database.neo4j_manager import add_graph_documents
 
 UPLOAD_DIR = "uploads"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
@@ -14,8 +16,8 @@ def upload_document(file):
             buffer.write(file.getvalue())
         
         documents = preprocess_document(file_path)
-        vectorstore.add_documents(documents)
-        graph.add_documents(documents)
+        add_documents_to_vectorstore(documents)
+        add_graph_documents(documents)
         
         return True, f"File {file.name} processed and added to the database"
     except Exception as e:
